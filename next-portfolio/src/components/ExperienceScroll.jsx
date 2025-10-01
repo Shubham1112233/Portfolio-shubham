@@ -2,13 +2,10 @@
 
 import { useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { PortableText } from '@portabletext/react';
 
-// Register ScrollTrigger plugin
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+// ScrollTrigger will be imported dynamically to avoid SSR issues
+let ScrollTrigger;
 
 const ExperienceScroll = ({ experience }) => {
   const containerRef = useRef(null);
@@ -30,73 +27,87 @@ const ExperienceScroll = ({ experience }) => {
       return;
     }
 
-    // Handle window resize
-    const handleResize = () => {
-      const newIsMobile = window.innerWidth < 768;
-      if (newIsMobile && container._horizontalScroll) {
-        container._horizontalScroll.kill();
-        container._horizontalScroll = null;
+    // Wait for ScrollTrigger to be loaded
+    const initScrollTrigger = async () => {
+      if (!ScrollTrigger) {
+        const module = await import('gsap/ScrollTrigger');
+        ScrollTrigger = module.ScrollTrigger;
+        gsap.registerPlugin(ScrollTrigger);
       }
-    };
 
-    window.addEventListener('resize', handleResize);
+      // Handle window resize
+      const handleResize = () => {
+        const newIsMobile = window.innerWidth < 768;
+        if (newIsMobile && container._horizontalScroll) {
+          container._horizontalScroll.kill();
+          container._horizontalScroll = null;
+        }
+      };
 
-    // Wait for content to be rendered
-    const timer = setTimeout(() => {
-      // Get the width of the scrollable content
-      const scrollWidth = scrollContent.scrollWidth - container.offsetWidth;
+      window.addEventListener('resize', handleResize);
 
-      if (scrollWidth > 0) {
-        // Create horizontal scroll animation
-        const horizontalScroll = gsap.to(scrollContent, {
-          x: -scrollWidth,
-          ease: 'none',
-          scrollTrigger: {
-            trigger: container,
-            start: 'top top',
-            end: `+=${scrollWidth}`,
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-            onUpdate: (self) => {
-              // Update progress bar
-              if (progressFill) {
-                gsap.to(progressFill, {
-                  width: `${self.progress * 100}%`,
-                  duration: 0.3,
-                  ease: 'power2.out'
+      // Wait for content to be rendered
+      const timer = setTimeout(() => {
+        // Get the width of the scrollable content
+        const scrollWidth = scrollContent.scrollWidth - container.offsetWidth;
+
+        if (scrollWidth > 0) {
+          // Create horizontal scroll animation
+          const horizontalScroll = gsap.to(scrollContent, {
+            x: -scrollWidth,
+            ease: 'none',
+            scrollTrigger: {
+              trigger: container,
+              start: 'top top',
+              end: `+=${scrollWidth}`,
+              scrub: 1,
+              pin: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+              onUpdate: (self) => {
+                // Update progress bar
+                if (progressFill) {
+                  gsap.to(progressFill, {
+                    width: `${self.progress * 100}%`,
+                    duration: 0.3,
+                    ease: 'power2.out'
+                  });
+                }
+                
+                // Update progress dots
+                const dots = container.querySelectorAll('.progress-dot');
+                const currentIndex = Math.round(self.progress * (dots.length - 1));
+                dots.forEach((dot, index) => {
+                  dot.classList.toggle('active', index === currentIndex);
                 });
               }
-              
-              // Update progress dots
-              const dots = container.querySelectorAll('.progress-dot');
-              const currentIndex = Math.round(self.progress * (dots.length - 1));
-              dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentIndex);
-              });
             }
-          }
-        });
+          });
 
-        // Store reference for cleanup
-        container._horizontalScroll = horizontalScroll;
-      }
-    }, 100);
-
-    // Cleanup function
-    return () => {
-      clearTimeout(timer);
-      window.removeEventListener('resize', handleResize);
-      if (container._horizontalScroll) {
-        container._horizontalScroll.kill();
-      }
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.trigger === container) {
-          trigger.kill();
+          // Store reference for cleanup
+          container._horizontalScroll = horizontalScroll;
         }
-      });
+      }, 100);
+
+      // Cleanup function
+      return () => {
+        clearTimeout(timer);
+        window.removeEventListener('resize', handleResize);
+        if (container._horizontalScroll) {
+          container._horizontalScroll.kill();
+        }
+        if (ScrollTrigger) {
+          ScrollTrigger.getAll().forEach(trigger => {
+            if (trigger.trigger === container) {
+              trigger.kill();
+            }
+          });
+        }
+      };
     };
+
+    // Initialize ScrollTrigger
+    initScrollTrigger();
   }, [experience]);
 
   if (!experience?.length) return null;
