@@ -9,7 +9,14 @@ export const personalProjectsQuery = groq`
     tech,
     repoUrl,
     liveUrl,
-    images
+    "mainImage": images[0].asset->{
+      _id,
+      url,
+      "metadata": {
+        "dimensions": metadata.dimensions,
+        "lqip": metadata.lqip
+      }
+    }
   }
 `
 
@@ -35,7 +42,37 @@ export const postsQuery = groq`
     "slug": slug.current,
     excerpt,
     publishedAt,
-    body
+    "body": body[0...2] // Limit body content for preview
+  }
+`
+
+// Add optimized single post query
+export const singlePostQuery = groq`
+  *[_type == "post" && slug.current == $slug][0] {
+    _id,
+    title,
+    "slug": slug.current,
+    excerpt,
+    publishedAt,
+    body,
+    "author": author->{
+      name,
+      image
+    }
+  }
+`
+
+// Add pagination support
+export const postsWithPaginationQuery = groq`
+  {
+    "posts": *[_type == "post"] | order(publishedAt desc)[$start...$end] {
+      _id,
+      title,
+      "slug": slug.current,
+      excerpt,
+      publishedAt
+    },
+    "total": count(*[_type == "post"])
   }
 `
 

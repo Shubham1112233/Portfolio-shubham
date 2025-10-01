@@ -1,51 +1,56 @@
-import { sanityClient } from "@/lib/sanity.client";
-import {
-  personalProjectsQuery,
-  experienceQuery,
-  postsQuery,
-} from "@/lib/queries";
+import { getHomepageData } from "@/lib/data-fetching";
 import { PortableText } from "@portabletext/react";
+import OptimizedImage from "@/components/OptimizedImage";
+import ScrollReveal from "@/components/ScrollReveal";
+import InteractiveExpertise from "@/components/InteractiveExpertise";
+import ExperienceScroll from "@/components/ExperienceScroll";
+import "@/styles/projects.css";
+import "@/styles/experience.css";
+import "@/styles/components.css";
+import "@/styles/banner.css";
+import "@/styles/contact.css";
+import "@/styles/education.css";
 
 export default async function Home() {
-  const [projects, experience, posts] = await Promise.all([
-    sanityClient.fetch(personalProjectsQuery),
-    sanityClient.fetch(experienceQuery),
-    sanityClient.fetch(postsQuery),
-  ]);
+  const { projects, experience, posts } = await getHomepageData();
 
   return (
-    <main className="np-root min-h-screen">
-      {/* Hero */}
-      {/* Hero matching legacy markup/classes (without GSAP) */}
-      <section className="home" id="home">
-        <div className="home-content">
-          <div className="text">
-            <div className="text-one animate__animated animate__slideInRight">
-              Hello,
-            </div>
-            <div
-              className="text-two animate__animated animate__slideInLeft rainbowText"
-              style={{ animationDelay: "1s" }}
-            >
-              I'm Shubham Ekkaldevi
-            </div>
-            <div className="text-three animate__animated animate__slideInLeft">
-              A Software Developer
-            </div>
-            <div className="text-four animate__animated animate__slideInLeft">
-              from Cisco Systems India
-            </div>
+    <main className="min-h-screen">
+      {/* Banner with Sliding Text Animation */}
+      <section className="banner-section" id="home">
+        <div className="banner-particles">
+          <div className="particle"></div>
+          <div className="particle"></div>
+          <div className="particle"></div>
+        </div>
+        <div className="banner-content">
+          <div className="sliding-text-container">
+            <div className="sliding-text">Hi,</div>
+            <div className="sliding-text">I am Shubham Ekkaldevi</div>
+            <div className="sliding-text">A Software Developer</div>
+            <div className="sliding-text">With 2.5+ Years of Experience</div>
           </div>
-          <div className="button">
-            <a href="#experience">
-              <button>More About Me</button>
+          <p className="banner-description">
+            Searching for a skilled partner to handle your next big challenge in
+            web and backend development? 🤝 You've found the one. I'm a Software
+            Engineer dedicated to turning complex ideas into scalable reality.
+            Whether it's a tight-knit startup team or a large enterprise
+            project,Ready to solve them all with
+            me?{" "}
+          </p>
+          <div className="banner-buttons">
+            <a href="#experience" className="banner-button primary">
+              <i className="fas fa-user"></i> About Me
+            </a>
+            <a href="#projects" className="banner-button">
+              <i className="fas fa-code"></i> My Projects
             </a>
           </div>
         </div>
       </section>
 
       {/* Content */}
-      <div className="np-section space-y-14">
+      <div className="content-wrapper">
         {/* About (static) */}
         <section className="about" id="about">
           <div className="content">
@@ -54,206 +59,443 @@ export default async function Home() {
             </div>
             <div className="about-details">
               <div className="left">
-                <img src="/assets/Shubhi.jpg" alt="My image" />
+                <img src="/assets/shubh_Linkedin.png" alt="My image" />
               </div>
               <div className="right">
+                {/* Interactive opening statement */}
                 <div className="topic">
-                  Experienced Software Developer from Cisco Systems India
+                  Let's Talk About Your Next Digital Solution.
                 </div>
                 <p>
-                  Passionate Software Developer specializing in front-end
-                  development in the Internet of Things (IoT) domain at Cisco.
-                  I'm dedicated to crafting seamless digital experiences that
-                  bridge technology and user-centric design.
+                  I'm a Software Engineer with 2.5+ years of experience
+                  dedicated to bringing ambitious projects to life. I specialize
+                  in the full lifecycle of development, focusing on robust
+                  Front-End Web Development and high-performance Backend
+                  Systems.
                 </p>
+
+                {/* List format for key skills */}
+                <div className="sub-heading">
+                  My Commitment to You
+                </div>
+                <ul>
+                  <li>
+                    <strong>Seamless Experiences:</strong> Crafting solutions that prioritize
+                    user-centric design.
+                  </li>
+                  <li>
+                    <strong>Technical Excellence:</strong> Ensuring the backend engine is as
+                    solid as the front-end interface is beautiful.
+                  </li>
+                  <li>
+                    <strong>Driven by Passion:</strong> For me, coding is a constant
+                    challenge and a joy. I take immense satisfaction in turning
+                    complex problems into elegant, working solutions.
+                  </li>
+                </ul>
+
                 <div className="topic" style={{ marginTop: 30 }}>
-                  Designing and Coding Is My Passion
+                  Ready to collaborate?
                 </div>
-                <p>
-                  Designing and coding aren't just things I do; they're part of
-                  who I am. I genuinely enjoy creating digital solutions that
-                  work well and look good. Solving problems in this field is
-                  like a puzzle I can't get enough of, and I'm always learning
-                  something new. But what I love most is the satisfaction of
-                  taking an idea and turning it into something practical and
-                  user-friendly.
-                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Projects (dynamic) */}
-        <section id="projects">
-          <div className="flex items-center justify-between mb-2">
-            <h2 className="np-section-title">Personal Projects</h2>
-          </div>
-          <ul className="projects-grid">
-            {projects?.map((p, idx) => (
-              <li key={p._id} className="project-card" style={{animationDelay: `${idx * 90}ms`}}>
-                <div className="project-title">{p.title}</div>
-                {p.summary && <p className="project-summary">{p.summary}</p>}
-                {Array.isArray(p.tech) && p.tech.length > 0 && (
-                  <ul className="project-badges">
-                    {p.tech.map((t, i) => (
-                      <li key={i} className="project-badge">{t}</li>
-                    ))}
-                  </ul>
-                )}
-                <div className="project-links space-x-4">
-                  {p.repoUrl && (
-                    <a href={p.repoUrl} target="_blank" rel="noreferrer">Repository</a>
-                  )}
-                  {p.liveUrl && (
-                    <a href={p.liveUrl} target="_blank" rel="noreferrer">Live</a>
-                  )}
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Experience (dynamic) - animated cards */}
-        <section id="experience">
-          <h2 className="np-section-title">Experience</h2>
-          <div className="experience-grid">
-            {experience?.map((e, idx) => (
-              <div key={e._id} className="experience-card" style={{animationDelay: `${idx * 90}ms`}}>
-                <div className="experience-title">{e.role}</div>
-                <div className="experience-sub">{e.company}</div>
-                <div className="experience-dates">{e.startDate} {e.endDate ? `→ ${e.endDate}` : e.current ? "→ Present" : null}</div>
-                {e.summary && (
-                  <div className="experience-text">
-                    <PortableText value={e.summary} />
+        {/* Expertise Section - Skill Grid */}
+        <ScrollReveal>
+          <section className="expertise-section" id="expertise">
+            <div className="expertise-container">
+              <div className="expertise-title">
+                <h2>My Expertise</h2>
+                <p>Technologies and tools I work with</p>
+              </div>
+              <div className="skills-grid">
+                <div className="skill-category">
+                  <h3>Frontend Fundamentals</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="HTML">HTML</span>
+                    <span className="skill-item" data-skill="CSS">CSS</span>
+                    <span className="skill-item" data-skill="JavaScript">JavaScript</span>
                   </div>
-                )}
-                {Array.isArray(e.tech) && e.tech.length > 0 && (
-                  <ul className="experience-tags">
-                    {e.tech.map((t, i) => (
-                      <li key={i} className="experience-tag">{t}</li>
-                    ))}
-                  </ul>
-                )}
+                </div>
+                
+                <div className="skill-category">
+                  <h3>Frontend Frameworks</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="React.js">React.js</span>
+                    <span className="skill-item" data-skill="Redux">Redux</span>
+                    <span className="skill-item" data-skill="Angular">Angular</span>
+                  </div>
+                </div>
+                
+                <div className="skill-category">
+                  <h3>Backend Development</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="Node.js">Node.js</span>
+                    <span className="skill-item" data-skill="Next.js">Next.js</span>
+                    <span className="skill-item" data-skill="Express.js">Express.js</span>
+                  </div>
+                </div>
+                
+                <div className="skill-category">
+                  <h3>Databases</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="SQL">SQL</span>
+                    <span className="skill-item" data-skill="PostgreSQL">PostgreSQL</span>
+                    <span className="skill-item" data-skill="MongoDB">MongoDB</span>
+                    <span className="skill-item" data-skill="Redis">Redis</span>
+                  </div>
+                </div>
+                
+                <div className="skill-category">
+                  <h3>CMS & PHP</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="PHP">PHP</span>
+                    <span className="skill-item" data-skill="WordPress">WordPress</span>
+                  </div>
+                </div>
+                
+                <div className="skill-category">
+                  <h3>DevOps & Tools</h3>
+                  <div className="skill-items">
+                    <span className="skill-item" data-skill="Git">Git</span>
+                    <span className="skill-item" data-skill="JIRA">JIRA</span>
+                    <span className="skill-item" data-skill="CI/CD">CI/CD</span>
+                    <span className="skill-item" data-skill="Docker">Docker</span>
+                    <span className="skill-item" data-skill="DevOps">DevOps</span>
+                    <span className="skill-item" data-skill="AWS">AWS</span>
+                  </div>
+                </div>
               </div>
-            ))}
+              <div className="skill-tooltip" id="skill-tooltip">
+                <div className="tooltip-content">
+                  <h4 id="tooltip-title">Skill</h4>
+                  <p id="tooltip-description">Hover over skills to learn more</p>
+                </div>
+              </div>
+            </div>
+            <InteractiveExpertise />
+          </section>
+        </ScrollReveal>
+
+        {/* Experience (dynamic) - Horizontal Scroll Design */}
+        <section id="experience" className="experience-section">
+          <div className="experience-container">
+            <div className="experience-title">
+              <h2>Professional Experience</h2>
+            </div>
+            <ExperienceScroll experience={experience} />
           </div>
         </section>
 
-        {/* Education (static) */}
-        <section id="education">
-          <div className="content">
-            <div className="title">
-              <span>Qualification and Courses</span>
-            </div>
-            <div className="table-responsive">
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th>Institute</th>
-                    <th>Course</th>
-                    <th>Score</th>
-                    <th>Year</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Qspider's Institute</td>
-                    <td>Software Development and Testing</td>
-                    <td></td>
-                    <td>2023</td>
-                  </tr>
-                  <tr>
-                    <td>NIIT Pune</td>
-                    <td>Advanced Diploma in Web Development</td>
-                    <td></td>
-                    <td>2022</td>
-                  </tr>
-                  <tr>
-                    <td>Pune University</td>
-                    <td>B.E Mechanical Engineering</td>
-                    <td>9.3 CGPA</td>
-                    <td>2022</td>
-                  </tr>
-                  <tr>
-                    <td>Government Polytechnic Pune</td>
-                    <td>Diploma in Mechanical Engineering</td>
-                    <td>83 Percent</td>
-                    <td>2019</td>
-                  </tr>
-                  <tr>
-                    <td>Vidya Niketan</td>
-                    <td>Secondary</td>
-                    <td>93 percent</td>
-                    <td>2016</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="roadmap-div container text-center overflow-hidden w-100">
-              <img
-                className="w-100 h-100 object-fit-cover"
-                src="/assets/Roadmap3.png"
-                alt="RoadMap of education"
-              />
-            </div>
-          </div>
-        </section>
-
-        {/* Posts (dynamic) */}
-        <section id="posts">
-          <h2 className="np-section-title">Posts</h2>
-          <ul className="np-grid np-grid-2">
-            {posts?.map((post) => (
-              <li key={post._id} className="np-card">
-                <div className="np-heading">{post.title}</div>
-                {post.excerpt && (
-                  <p className="np-muted mt-1 text-sm">{post.excerpt}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-
-        {/* Contact (static) */}
-        <section className="services" id="services">
-          <div className="content">
-            <div className="title">
-              <span>Contact</span>
-            </div>
-            <div className="boxes">
-              <div className="box">
-                <div className="icon">
-                  <i className="fas fa-mobile-alt"></i>
-                </div>
-                <div className="topic">Mobile Number</div>
-                <p>+91 9156802283</p>
+        {/* Projects (dynamic) - Modern Glassmorphism Design */}
+        <ScrollReveal>
+          <section id="projects" className="projects-section">
+            <div className="projects-container">
+              <div className="projects-title">
+                <h2 className="gradient-text">Personal Projects</h2>
               </div>
-              <div className="box">
-                <div className="icon">
-                  <i className="fas fa-envelope"></i>
-                </div>
-                <div className="topic">Email</div>
-                <p>shubhamind722@gmail.com</p>
+              <div className="projects-grid">
+                {projects?.map((p, idx) => (
+                  <ScrollReveal key={p._id} delay={idx * 100}>
+                    <div className="project-card card-hover magnetic">
+                      {p.mainImage && (
+                        <div className="project-image-container">
+                          <OptimizedImage
+                            src={p.mainImage.url}
+                            alt={`${p.title} project screenshot`}
+                            width={300}
+                            height={200}
+                            className="project-image"
+                            priority={idx < 2}
+                          />
+                          <div className="project-overlay">
+                            <div className="project-overlay-content">
+                              <span className="project-overlay-text">
+                                View Details
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      <div className="project-content">
+                        <h3 className="project-title">{p.title}</h3>
+                        {p.summary && (
+                          <p className="project-summary">{p.summary}</p>
+                        )}
+                        {Array.isArray(p.tech) && p.tech.length > 0 && (
+                          <div className="project-badges">
+                            {p.tech.map((t, i) => (
+                              <span key={i} className="project-badge">
+                                {t}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <div className="project-links">
+                          {p.repoUrl && (
+                            <a
+                              href={p.repoUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="glass-button"
+                            >
+                              <i className="fab fa-github"></i> Code
+                            </a>
+                          )}
+                          {p.liveUrl && (
+                            <a
+                              href={p.liveUrl}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="glass-button"
+                            >
+                              <i className="fas fa-external-link-alt"></i> Live
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </ScrollReveal>
+                ))}
               </div>
-              <div className="box">
-                <div className="icon">
-                  <i className="fab fa-linkedin"></i>
+            </div>
+          </section>
+        </ScrollReveal>
+
+        {/* Education - Modern Timeline Design */}
+        <ScrollReveal>
+          <section className="education-section" id="education">
+            <div className="education-container">
+              <div className="education-title">
+                <h2>Education & Qualifications</h2>
+              </div>
+              <div className="education-timeline">
+                <div className="education-item">
+                  <div className="education-content">
+                    <div className="education-institute">
+                      Qspider's Institute
+                    </div>
+                    <div className="education-course">
+                      Software Development and Testing
+                    </div>
+                    <div className="education-score">
+                      Professional Certification
+                    </div>
+                    <div className="education-year">2023</div>
+                  </div>
                 </div>
-                <div className="topic">LinkedIn</div>
-                <p>
+                <div className="education-item">
+                  <div className="education-content">
+                    <div className="education-institute">NIIT Pune</div>
+                    <div className="education-course">
+                      Advanced Diploma in Web Development
+                    </div>
+                    <div className="education-score">Specialized Training</div>
+                    <div className="education-year">2022</div>
+                  </div>
+                </div>
+                <div className="education-item">
+                  <div className="education-content">
+                    <div className="education-institute">Pune University</div>
+                    <div className="education-course">
+                      B.E Mechanical Engineering
+                    </div>
+                    <div className="education-score">9.3 CGPA</div>
+                    <div className="education-year">2022</div>
+                  </div>
+                </div>
+                <div className="education-item">
+                  <div className="education-content">
+                    <div className="education-institute">
+                      Government Polytechnic Pune
+                    </div>
+                    <div className="education-course">
+                      Diploma in Mechanical Engineering
+                    </div>
+                    <div className="education-score">83 Percent</div>
+                    <div className="education-year">2019</div>
+                  </div>
+                </div>
+                <div className="education-item">
+                  <div className="education-content">
+                    <div className="education-institute">Vidya Niketan</div>
+                    <div className="education-course">Secondary Education</div>
+                    <div className="education-score">93 Percent</div>
+                    <div className="education-year">2016</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+                {/* Certifications Section - Separate */}
+                <ScrollReveal>
+          <section className="certifications-section" id="certifications">
+            <div className="certifications-container">
+              <div className="certifications-title">
+                <h2>Certifications</h2>
+              </div>
+              <div className="certifications-grid">
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">CCNA</div>
+                    <div>
+                      <div className="certification-card-title">Cisco Certified Networking Associate</div>
+                      <div className="certification-card-subtitle">Cisco Systems</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Professional certification in networking fundamentals, routing, and switching technologies.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">Networking</span>
+                    <span className="certification-tag">Routing</span>
+                    <span className="certification-tag">Switching</span>
+                  </div>
+                </div>
+
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">Java</div>
+                    <div>
+                      <div className="certification-card-title">Complete Java Full Stack Development</div>
+                      <div className="certification-card-subtitle">Simplilearn</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Comprehensive full-stack development with Java, Spring Boot, and modern web technologies.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">Java</span>
+                    <span className="certification-tag">Spring Boot</span>
+                    <span className="certification-tag">Full Stack</span>
+                  </div>
+                </div>
+
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">Python</div>
+                    <div>
+                      <div className="certification-card-title">Python Programming</div>
+                      <div className="certification-card-subtitle">Simplilearn</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Advanced Python programming with data structures, algorithms, and web development frameworks.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">Python</span>
+                    <span className="certification-tag">Django</span>
+                    <span className="certification-tag">Flask</span>
+                  </div>
+                </div>
+
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">Backend</div>
+                    <div>
+                      <div className="certification-card-title">Backend Development Expert</div>
+                      <div className="certification-card-subtitle">Simplilearn</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Specialized in backend architecture, API development, and database optimization.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">Node.js</span>
+                    <span className="certification-tag">Express</span>
+                    <span className="certification-tag">MongoDB</span>
+                  </div>
+                </div>
+
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">DevOps</div>
+                    <div>
+                      <div className="certification-card-title">DevOps Frameworks</div>
+                      <div className="certification-card-subtitle">Simplilearn</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Implementation of DevOps practices, CI/CD pipelines, and containerization technologies.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">Docker</span>
+                    <span className="certification-tag">Kubernetes</span>
+                    <span className="certification-tag">CI/CD</span>
+                  </div>
+                </div>
+
+                <div className="certification-card">
+                  <div className="certification-card-header">
+                    <div className="certification-logo">Frontend</div>
+                    <div>
+                      <div className="certification-card-title">Frontend Development</div>
+                      <div className="certification-card-subtitle">Simplilearn</div>
+                    </div>
+                  </div>
+                  <div className="certification-card-description">
+                    Modern frontend development with React, Vue.js, and responsive web design principles.
+                  </div>
+                  <div className="certification-tags">
+                    <span className="certification-tag">React</span>
+                    <span className="certification-tag">Vue.js</span>
+                    <span className="certification-tag">JavaScript</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </ScrollReveal>
+
+
+        {/* Contact - Modern Design */}
+        <ScrollReveal>
+          <section className="contact-section" id="contact">
+            <div className="contact-container">
+              <div className="contact-title">
+                <h2>Get In Touch</h2>
+              </div>
+              <div className="contact-grid">
+                <div className="contact-card">
+                  <div className="contact-icon">
+                    <i className="fas fa-mobile-alt"></i>
+                  </div>
+                  <h3>Phone</h3>
+                  <p>+91 9156802283</p>
+                  <a href="tel:+919156802283">Call Now</a>
+                </div>
+                <div className="contact-card">
+                  <div className="contact-icon">
+                    <i className="fas fa-envelope"></i>
+                  </div>
+                  <h3>Email</h3>
+                  <p>shubhamind722@gmail.com</p>
+                  <a href="mailto:shubhamind722@gmail.com">Send Email</a>
+                </div>
+                <div className="contact-card">
+                  <div className="contact-icon">
+                    <i className="fab fa-linkedin"></i>
+                  </div>
+                  <h3>LinkedIn</h3>
+                  <p>Professional Profile</p>
                   <a
                     href="https://www.linkedin.com/in/shubham-ekkaldevi-165464197/"
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    Profile
+                    View Profile
                   </a>
-                </p>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </ScrollReveal>
       </div>
     </main>
   );
 }
+
